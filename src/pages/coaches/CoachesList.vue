@@ -42,6 +42,8 @@ export default {
   computed: {
     filteredCoaches() {
       const coaches = this.$store.getters['coaches/coaches'];
+
+      console.log(coaches);
       return coaches.filter(x => {
         if(this.activeFilters.frontend && x.areas.includes('frontend')){
           return true;
@@ -67,12 +69,9 @@ export default {
       this.activeFilters = updatedFilters;
     },
     loadCoaches(){
-      this.$store.dispatch['coaches/loadCoach']
+      this.$store.dispatch('coaches/loadCoach')
     }
-  },
-  created() {
-    this.loadCoaches();
-  },
+  }
 }
 </script>
 
