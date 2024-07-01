@@ -1,4 +1,7 @@
 <template>
+  <base-dialog :show="!!error" title="An error occurred!" @close="handleError">
+    <p>{{ error }}</p>
+  </base-dialog>
   <section>
     <coach-filter @change-filter="setFilters"></coach-filter>
   </section>
@@ -6,9 +9,12 @@
     <base-card>
       <div class="controls">
         <base-button mode="outline" @click="loadCoaches">Refresh</base-button>
-        <base-button link to="/register" v-if="!isCoach">Register as Coach</base-button>
+        <base-button link to="/register" v-if="!isCoach && !isLoading">Register as Coach</base-button>
       </div>
-      <ul v-if="hasCoaches">
+      <div v-if="isLoading">
+        <base-spinner></base-spinner>      
+      </div>
+      <ul v-else-if="hasCoaches">
         <coach-item 
           v-for="coach in filteredCoaches" 
           :key="coach.id" 
@@ -32,6 +38,8 @@ export default {
   components: { CoachItem, CoachFilter },
   data() {
     return {
+      isLoading: false,
+      error: null,
       activeFilters: {
         frontend: true,
         backend: true,
@@ -43,7 +51,6 @@ export default {
     filteredCoaches() {
       const coaches = this.$store.getters['coaches/coaches'];
 
-      console.log(coaches);
       return coaches.filter(x => {
         if(this.activeFilters.frontend && x.areas.includes('frontend')){
           return true;
@@ -58,9 +65,10 @@ export default {
       });
     },
     hasCoaches() {
-      return this.$store.getters['coaches/hasCoaches']
+      return !this.isLoading && this.$store.getters['coaches/hasCoaches']
     },
     isCoach(){
+      console.log(this.$store.getters['coaches/isCoach']);
       return this.$store.getters['coaches/isCoach'];
     }
   },
@@ -68,10 +76,22 @@ export default {
     setFilters(updatedFilters){
       this.activeFilters = updatedFilters;
     },
-    loadCoaches(){
-      this.$store.dispatch('coaches/loadCoach')
+    async loadCoaches(){
+      this.isLoading = true;
+      try{
+        await this.$store.dispatch('coaches/loadCoach');
+      }catch(error){
+        this.error = error.message || 'something went wrong!';
+      }
+      this.isLoading = false;
+    },
+    handleError(){
+      this.error = null;
     }
-  }
+  },
+  created() {
+      this.loadCoaches()
+    },
 }
 </script>
 

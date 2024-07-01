@@ -8,7 +8,6 @@ export default {
     isCoach(_, getters, _1, rootGetters){
         const coaches = getters.coaches;
         const userId = rootGetters.userId; 
-        
-        return coaches.some(x => x.id === userId);
+        return coaches.some(obj => obj.id === userId);
     }
 };

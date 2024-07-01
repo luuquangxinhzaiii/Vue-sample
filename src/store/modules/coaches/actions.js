@@ -16,7 +16,9 @@ export default {
       {
         body: JSON.stringify(coachData),
       }
-    );
+    ).catch(function (error){
+        throw new Error(error.response.statusText || 'false to registration')
+    });
 
     context.commit("registerCoach", {
       ...coachData,
@@ -27,7 +29,9 @@ export default {
   async loadCoach(context) {
     const response = await axios.get(
       `https://vue-firebase-demo-application-default-rtdb.asia-southeast1.firebasedatabase.app/coaches.json`
-    );
+    ).catch(function (error){
+        throw new Error(error.response.statusText || 'fail to fetch!')
+    });
 
     const responseData = response.data;
     const coaches = [];
