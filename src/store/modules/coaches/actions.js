@@ -26,7 +26,10 @@ export default {
     });
   },
 
-  async loadCoach(context) {
+  async loadCoach(context, payload) {
+    if(!payload.forceReload && !context.getters.shouldUpdate){
+        return;
+    }
     const response = await axios.get(
       `https://vue-firebase-demo-application-default-rtdb.asia-southeast1.firebasedatabase.app/coaches.json`
     ).catch(function (error){
@@ -49,5 +52,6 @@ export default {
     }
 
     context.commit("appendCoach", coaches);
+    context.commit("setFetchTimestamp");
   },
 };
