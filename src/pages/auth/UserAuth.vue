@@ -1,25 +1,27 @@
 <template>
-    <base-dialog :show="!!error" title="An error occurred!" @close="handleError">
-      <p>{{ error }}</p>
-    </base-dialog>
-    <base-card>
-        <form @submit.prevent="submitForm">
-            <div class="form-control">
-                <label for="email">Email</label>
-                <input type="email" id="email" v-model.trim="email"/>
-            </div>
-            <div class="form-control">
-                <label for="password">Password</label>
-                <input type="password" id="password" v-model.trim="password"/>
-            </div>
-            <div v-if="isLoading">
-                <base-spinner></base-spinner>      
-            </div>
-            <p v-if="!formIsValid && !isLoading">Input is not valid</p>
-            <base-button>{{ submitButtonCaption }}</base-button>
-            <base-button type="button" mode="flat" v-on:click="switchMode">{{ switchModeButtonCaption }}</base-button>
-        </form>
-    </base-card>
+    <div>
+        <base-dialog :show="!!error" title="An error occurred!" @close="handleError" fixed>
+          <p>{{ error }}</p>
+        </base-dialog>
+        <base-dialog :show="isLoading" title="Authenticating ..." fixed>
+            <base-spinner></base-spinner>  
+        </base-dialog>
+        <base-card>
+            <form @submit.prevent="submitForm">
+                <div class="form-control">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" v-model.trim="email"/>
+                </div>
+                <div class="form-control">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" v-model.trim="password"/>
+                </div>
+                <p v-if="!formIsValid && !isLoading">Input is not valid</p>
+                <base-button>{{ submitButtonCaption }}</base-button>
+                <base-button type="button" mode="flat" v-on:click="switchMode">{{ switchModeButtonCaption }}</base-button>
+            </form>
+        </base-card>
+    </div>
 </template>
 
 <script>
@@ -59,14 +61,25 @@ export default {
                 this.isLoading = false;
                 return;
             }
-            if(this.mode === 'login'){
-                //
-            }else{
-                await this.$store.dispatch('signUp', {
-                    email: this.email,
-                    password: this.password
-                });
+            try{
+                if(this.mode === 'login'){
+                    await this.$store.dispatch('login', {
+                        email: this.email,
+                        password: this.password
+                    });
+                }else{
+                    await this.$store.dispatch('signUp', {
+                        email: this.email,
+                        password: this.password
+                    });
+                }
+
+                const redirectUrl = '/'+(this.$route.query.redirect || 'coaches');
+                this.$router.replace(redirectUrl);
+            }catch(err){
+                this.error = err.message || 'false to authentication, try again !';
             }
+            
             this.isLoading = false;
         },
         switchMode(){
@@ -75,6 +88,9 @@ export default {
             }else{
                 this.mode = 'login'
             }
+        },
+        handleError(){
+            this.error = null;
         }
     },
 }

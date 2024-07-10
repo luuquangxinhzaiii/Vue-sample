@@ -11,8 +11,10 @@ export default {
       areas: data.areas,
     };
 
+    const token = context.rootGetters.token;
+
     await axios.put(
-      `https://vue-firebase-demo-application-default-rtdb.asia-southeast1.firebasedatabase.app/coaches/${userId}.json`,
+      `https://vue-firebase-demo-application-default-rtdb.asia-southeast1.firebasedatabase.app/coaches/${userId}.json?auth=`+token,
       {
         body: JSON.stringify(coachData),
       }

@@ -25,8 +25,9 @@ export default {
 
     async fetchRequest(context){
         const coachId = context.rootGetters.userId;
+        const token = context.rootGetters.token;
         const response =  await axios.get(
-            `https://vue-firebase-demo-application-default-rtdb.asia-southeast1.firebasedatabase.app/request/${coachId}.json`,
+            `https://vue-firebase-demo-application-default-rtdb.asia-southeast1.firebasedatabase.app/request/${coachId}.json?auth=`+token,
         ).catch(function (error){
             throw new Error(error.response.statusText || 'false to fetch contact!')
         });
